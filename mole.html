@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack a Mole</title>
+    <style>
+        body {
+            background-color: black;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        #game-container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            margin: auto;
+            background: url('background1.jpg') no-repeat center center/cover;
+        }
+        #canvas {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background-color: black;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+        .pipe {
+            width: 200px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+        }
+        .mole, .piranha {
+            width: 80px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
+        #score-board {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #high-score {
+            font-size: 18px;
+            color: yellow;
+        }
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="score-board">Score: <span id="score">0</span></div>
+        <div id="high-score">High Score: <span id="high">0</span></div>
+        <div id="canvas">
+            <img src="pipe.png" class="pipe">
+            <img src="mole.png" class="mole">
+            <img src="piranha.png" class="piranha">
+        </div>
+        <button id="start-button">Start Game</button>
+    </div>
+    <script>
+        let score = 0;
+        let highScore = 0;
+        let gameActive = false;
+        
+        const mole = document.querySelector('.mole');
+        const piranha = document.querySelector('.piranha');
+        const scoreText = document.getElementById('score');
+        const highScoreText = document.getElementById('high');
+        const startButton = document.getElementById('start-button');
+        const canvas = document.getElementById('canvas');
+        
+        const positions = [220, 230, 240, 250];
+        
+        function showRandom() {
+            if (!gameActive) return;
+            
+            const choice = Math.random() < 0.5 ? mole : piranha;
+            const other = choice === mole ? piranha : mole;
+            
+            let randomY = positions[Math.floor(Math.random() * positions.length)];
+            choice.style.top = randomY + 'px';
+            choice.style.display = 'block';
+            other.style.display = 'none';
+            
+            setTimeout(hideAll, 1000);
+        }
+        
+        function hideAll() {
+            if (!gameActive) return;
+            mole.style.display = 'none';
+            piranha.style.display = 'none';
+            setTimeout(showRandom, Math.random() * 2000 + 1000);
+        }
+        
+        canvas.addEventListener('click', function(event) {
+            if (!gameActive) return;
+            
+            if (event.target.classList.contains('mole')) {
+                score++;
+                scoreText.textContent = score;
+                hideAll();
+            } else if (event.target.classList.contains('piranha')) {
+                scoreText.textContent = 'Game Over!';
+                scoreText.style.color = 'red';
+                gameActive = false;
+                startButton.textContent = 'Restart Game';
+                startButton.disabled = false;
+                if (score > highScore) {
+                    highScore = score;
+                    highScoreText.textContent = highScore;
+                }
+            }
+        });
+        
+        startButton.addEventListener('click', function() {
+            score = 0;
+            scoreText.textContent = score;
+            scoreText.style.color = 'white';
+            gameActive = true;
+            startButton.disabled = true;
+            
+            mole.style.display = 'none';
+            piranha.style.display = 'none';
+            
+            showRandom();
+        });
+    </script>
+</body>
+</html>
